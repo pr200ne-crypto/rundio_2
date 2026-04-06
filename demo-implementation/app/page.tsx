@@ -1,4 +1,4 @@
-import { LandingRunningPhotos } from '@/components/LandingRunningPhotos'
+import { LandingHeroIllustration } from '@/components/LandingHeroIllustration'
 import { RundioLogoOptionA } from '@/components/RundioLogoOptionA'
 import { StartCta } from '@/components/StartCta'
 
@@ -27,7 +27,7 @@ export default function LandingPage() {
             </a>
           </div>
         </div>
-        <LandingRunningPhotos />
+        <LandingHeroIllustration />
       </header>
 
       <section id="demo" className="mb-24">
