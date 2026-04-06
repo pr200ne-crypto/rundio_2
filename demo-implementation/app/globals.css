@@ -27,3 +27,10 @@
       sans-serif;
   }
 }
+
+/* @layer より後ろ＋!important で、preflight / 拡張機能との干渉を潰す */
+html,
+body {
+  background-color: #09090b !important;
+  color: #f4f4f5 !important;
+}
