@@ -1,29 +1,33 @@
+import { LandingRunningPhotos } from '@/components/LandingRunningPhotos'
 import { RundioLogoOptionA } from '@/components/RundioLogoOptionA'
 import { StartCta } from '@/components/StartCta'
 
 export default function LandingPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
-      <header className="mb-16 text-center">
-        <div className="mb-10 flex justify-center">
-          <RundioLogoOptionA variant="hero" />
+      <header className="mb-16 grid gap-12 lg:grid-cols-2 lg:items-center lg:gap-14">
+        <div className="text-center lg:text-left">
+          <div className="mb-10 flex justify-center lg:justify-start">
+            <RundioLogoOptionA variant="hero" />
+          </div>
+          <h1 className="text-4xl font-semibold tracking-tight text-zinc-50 md:text-5xl">
+            走るほど、あなただけのラジオ
+          </h1>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400 lg:mx-0">
+            距離も時間も、好みもゴールも。AIが<strong className="text-zinc-200">走る前に</strong>
+            あなたのセッションに合わせた放送を用意します。
+          </p>
+          <div className="mt-10 flex flex-wrap justify-center gap-4 lg:justify-start">
+            <StartCta />
+            <a
+              href="#demo"
+              className="rounded-full border border-zinc-600 px-8 py-3 text-sm font-medium text-zinc-200 transition hover:border-zinc-400"
+            >
+              デモを見る
+            </a>
+          </div>
         </div>
-        <h1 className="text-4xl font-semibold tracking-tight text-zinc-50 md:text-5xl">
-          走るほど、あなただけのラジオ
-        </h1>
-        <p className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400">
-          距離も時間も、好みもゴールも。AIが<strong className="text-zinc-200">走る前に</strong>
-          あなたのセッションに合わせた放送を用意します。
-        </p>
-        <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <StartCta />
-          <a
-            href="#demo"
-            className="rounded-full border border-zinc-600 px-8 py-3 text-sm font-medium text-zinc-200 transition hover:border-zinc-400"
-          >
-            デモを見る
-          </a>
-        </div>
+        <LandingRunningPhotos />
       </header>
 
       <section id="demo" className="mb-24">

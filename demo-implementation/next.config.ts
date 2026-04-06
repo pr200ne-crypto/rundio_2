@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   outputFileTracingRoot: path.join(__dirname),
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+    ],
+  },
 }
 
 export default nextConfig
