@@ -17,8 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang="ja">
-        <body className="min-h-screen antialiased">{children}</body>
+      <html lang="ja" className="h-full bg-zinc-950">
+        <body className="min-h-screen bg-zinc-950 text-zinc-100 antialiased">{children}</body>
       </html>
     </ClerkProvider>
   )
