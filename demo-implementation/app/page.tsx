@@ -1,10 +1,13 @@
+import { RundioLogoOptionA } from '@/components/RundioLogoOptionA'
 import { StartCta } from '@/components/StartCta'
 
 export default function LandingPage() {
   return (
     <main className="mx-auto max-w-6xl px-6 py-16">
       <header className="mb-16 text-center">
-        <p className="mb-2 text-sm tracking-widest text-cyan-400">RUNdio</p>
+        <div className="mb-10 flex justify-center">
+          <RundioLogoOptionA variant="hero" />
+        </div>
         <h1 className="text-4xl font-semibold tracking-tight text-zinc-50 md:text-5xl">
           走るほど、あなただけのラジオ
         </h1>

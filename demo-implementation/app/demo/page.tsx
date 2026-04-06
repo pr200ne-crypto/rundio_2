@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { RundioLogoOptionA } from '@/components/RundioLogoOptionA'
 
 /**
  * LP の iframe 内で表示するミニUI（見た目のプレースホルダー）。
@@ -8,8 +9,8 @@ export default function DemoEmbedPage() {
   return (
     <div className="flex min-h-full flex-col bg-gradient-to-b from-zinc-950 to-zinc-900 text-zinc-100">
       <div className="border-b border-zinc-800 px-4 py-3">
-        <p className="text-xs font-medium uppercase tracking-wider text-cyan-400">RUNdio</p>
-        <p className="text-sm text-zinc-400">今日のセッション</p>
+        <RundioLogoOptionA variant="embed" />
+        <p className="mt-2 text-sm text-zinc-400">今日のセッション</p>
       </div>
       <div className="flex flex-1 flex-col gap-6 p-4">
         <div>
