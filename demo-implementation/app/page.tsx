@@ -24,12 +24,6 @@ export default function LandingPage() {
       </header>
 
       <section id="demo" className="mb-24">
-        <h2 className="mb-2 text-center text-sm font-medium uppercase tracking-wider text-zinc-500">
-          Live demo（スマホ枠）
-        </h2>
-        <p className="mb-10 text-center text-zinc-400">
-          PCプレゼン用。実機は iOS Safari で同じURLを開いてください。
-        </p>
         <div className="flex justify-center">
           <div className="relative rounded-[2.75rem] border-[10px] border-zinc-800 bg-zinc-900 p-3 shadow-2xl shadow-cyan-900/20">
             <div className="absolute left-1/2 top-0 z-10 h-6 w-24 -translate-x-1/2 rounded-b-xl bg-zinc-800" />
@@ -41,12 +35,6 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
-
-      <footer className="border-t border-zinc-800 pt-12 text-center text-sm text-zinc-500">
-        社内向けプレゼン用プロトタイプ — 要件は{' '}
-        <code className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">docs/input/</code>{' '}
-        を参照
-      </footer>
     </main>
   )
 }

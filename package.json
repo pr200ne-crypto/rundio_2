@@ -1,0 +1,10 @@
+{
+  "name": "rundio2",
+  "private": true,
+  "description": "リポジトリルートから Next デモを起動するエイリアス",
+  "scripts": {
+    "dev": "npm run dev --prefix demo-implementation",
+    "build": "npm run build --prefix demo-implementation",
+    "start": "npm run start --prefix demo-implementation"
+  }
+}
