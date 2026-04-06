@@ -23,28 +23,27 @@ export function LandingRunningPhotos() {
     <div className="mx-auto flex w-full max-w-md flex-col gap-6 lg:mx-0 lg:max-w-none">
       {PHOTOS.map((photo, index) => (
         <figure key={photo.src} className="w-full">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl ring-1 ring-orange-400/25 ring-offset-2 ring-offset-zinc-950">
-            <Image
-              src={photo.src}
-              alt={photo.alt}
-              fill
-              className="object-cover contrast-[1.05] saturate-[1.12] hue-rotate-[-8deg]"
-              sizes="(max-width: 1024px) 100vw, 480px"
-              priority={index === 0}
-            />
-            {/* 案A: 朝焼けオレンジ〜スカイシアンへ寄せる */}
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-orange-500/45 via-amber-400/25 to-cyan-500/45 mix-blend-soft-light"
-              aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-950/55 via-transparent to-zinc-950/45"
-              aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute inset-0 bg-orange-400/10 mix-blend-overlay"
-              aria-hidden
-            />
+          <div className="rounded-2xl ring-1 ring-orange-400/25 ring-offset-2 ring-offset-zinc-950">
+            <div className="relative w-full overflow-hidden rounded-2xl">
+              <Image
+                src={photo.src}
+                alt={photo.alt}
+                width={960}
+                height={640}
+                className="h-auto w-full object-cover contrast-[1.04] saturate-[1.1] hue-rotate-[-6deg]"
+                sizes="(max-width: 1024px) 100vw, 520px"
+                priority={index === 0}
+              />
+              {/* 案Aの色味（mix-blend は環境によって真っ暗になるため通常の半透明グラデのみ） */}
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-orange-500/30 via-amber-400/10 to-cyan-500/25"
+                aria-hidden
+              />
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-b from-zinc-950/25 via-transparent to-zinc-950/35"
+                aria-hidden
+              />
+            </div>
           </div>
           <figcaption className="mt-2 text-center text-[11px] leading-relaxed text-zinc-500 lg:text-left">
             <a

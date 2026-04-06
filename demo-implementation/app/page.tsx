@@ -11,7 +11,7 @@ export default function LandingPage() {
             <RundioLogoOptionA variant="hero" />
           </div>
           <h1 className="text-4xl font-semibold tracking-tight text-zinc-50 md:text-5xl">
-            走るほど、あなただけのラジオ
+            走りに寄り添うあなただけのラジオ
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400 lg:mx-0">
             距離も時間も、好みもゴールも。AIが<strong className="text-zinc-200">走る前に</strong>

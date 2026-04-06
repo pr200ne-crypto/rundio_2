@@ -6,7 +6,7 @@ import './globals.css'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'RUNdio — 走るほど、あなたのラジオ',
+  title: 'RUNdio — 走りに寄り添うあなただけのラジオ',
   description: 'RUNdio（社内デモ）— ラン × レディオ',
 }
 
