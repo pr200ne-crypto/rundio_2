@@ -11,8 +11,8 @@ const isPublicRoute = createRouteMatcher([
 ])
 
 /**
- * オプションは「リクエストごと」に返す（ビルド時に CLERK_SECRET_KEY が空で束縛されるのを防ぐ）。
- * authorizedParties に実際のオリジンを入れ、本番 URL とセッションの azp のズレによる Handshake 失敗を抑える。
+ * キーはリクエスト時に読む（Edge バンドルで空になるのを防ぐ）。
+ * authorizedParties は Development の azp と衝突して Handshake 失敗することがあるため付けない。
  */
 export default clerkMiddleware(
   async (auth, request: NextRequest) => {
@@ -21,16 +21,10 @@ export default clerkMiddleware(
     }
     return NextResponse.next({ request })
   },
-  (request) => {
-    const origin = new URL(request.url).origin
-    return {
-      publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
-      secretKey: process.env.CLERK_SECRET_KEY,
-      signInUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
-      signUpUrl: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
-      authorizedParties: [origin],
-    }
-  }
+  () => ({
+    publishableKey: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    secretKey: process.env.CLERK_SECRET_KEY,
+  })
 )
 
 export const config = {
