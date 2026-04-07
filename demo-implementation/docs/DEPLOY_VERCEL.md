@@ -45,7 +45,18 @@
 | Publishable key | `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` |
 | Secret key | `CLERK_SECRET_KEY` |
 
-- Clerk 上部が **Development** のときは開発用キーです。**Production** 用インスタンス／キーがある場合は、Vercel の **Production** 環境には **Production** 側のキーを入れるのが安全です（Development キーだけだと本番で想定外になることがあります）。
+### `*.vercel.app` だけでデプロイする場合（推奨・この手順で問題なし）
+
+Clerk の公式ドキュメントでも、**自分のドメイン（DNS）なしの `https://xxxx.vercel.app` では、Clerk の「Production インスタンス」＋ `pk_live_` は使えません**。  
+その代わり、次で **ちゃんと動きます**。
+
+1. [Clerk Dashboard](https://dashboard.clerk.com) で **Development** のまま（または開発用インスタンス）でよい  
+2. **API Keys** は **`pk_test_` / `sk_test_` のペア**を Vercel の環境変数にそのまま貼る（[API Keys 直リンク](https://dashboard.clerk.com/~/api-keys)）  
+3. 次の「5. Clerk（Vercel URL…）」の手順どおり、**その同じ Development 側**に **`https://あなたのプロジェクト.vercel.app` を必ず追加**する  
+
+**Publishable と Secret は必ず同じ Clerk アプリ・同じ環境からコピーしたペアにする**（混在させない）。
+
+独自ドメインを Vercel に載せて Clerk Production を完了させた場合だけ、`pk_live_` / `sk_live_` に切り替えます。
 
 ---
 
@@ -69,11 +80,13 @@ Vercel → Project → **Settings** → **Environment Variables** に、上記 C
 
 ---
 
-## 5. Clerk（本番 URL・ドメイン・Google）
+## 5. Clerk（Vercel URL・ドメイン・Google）
 
-1. 同じく **Configure** 内で、**Domains** / **Paths** / **Allowed origins** / **Application URLs** など（表記は Clerk の版で異なります）を開く  
-2. デプロイ先の **`https://xxxx.vercel.app`（実際の本番 URL）** を、許可ドメイン／フロントエンド URL として追加する  
-   - ここを忘れると、**本番だけ**ログインやリダイレクトで失敗することがあります  
+**`*.vercel.app` で運用する場合は、Clerk も Development インスタンスの設定でよい**（上の「3. Clerk → Vercel に API キー」を参照）。
+
+1. [Clerk Dashboard](https://dashboard.clerk.com) → 対象アプリ → **Configure** 内で、**Domains** / **Paths** / **Allowed origins** / **Application URLs** など（表記は Clerk の版で異なります）を開く  
+2. デプロイ先の **`https://xxxx.vercel.app`（Vercel の Visit で開ける実 URL）** を、許可ドメイン／フロントエンド URL として追加する  
+   - ここを忘れると、**Vercel 上だけ**ログインやリダイレクトで失敗することがあります  
 3. **Google ログイン**を使う場合: **Configure** → **User & Authentication** → **Social connections**（など）で Google を有効にする（ローカルと同様）
 
 ### 本番 URL を変えた直後にやること（例: `ru-ndio` → `rundio`）
@@ -86,7 +99,7 @@ Vercel で **Project Name** を変えると、`https://xxxx.vercel.app` の **`x
 #### Clerk（ここはダッシュボードでの手作業のみ）
 
 1. [Clerk Dashboard](https://dashboard.clerk.com) を開き、対象アプリを選ぶ。  
-2. 画面上部の環境で **Production** を選ぶ（本番サイト用。Development だけ直しても本番は直らない）。  
+2. **`*.vercel.app` のみ使う場合**は、**Development**（開発用インスタンス）のまま作業する。独自ドメイン＋ Clerk Production を使っている場合だけ、**Production** 側も同様に直す。  
 3. **Configure** タブを開く。  
 4. 次のような項目を **ひとつずつ**開き、表示されている URL・ドメインの一覧から **OLD** を探す。  
    - 見つかったら **NEW に差し替え**、または **NEW を追加したうえで OLD を削除**（両方許可する画面なら、移行中だけ両方残してもよい）。  
@@ -131,8 +144,9 @@ Vercel で **Project Name** を変えると、`https://xxxx.vercel.app` の **`x
 
 | 現象 | 対処 |
 |------|------|
+| トップが **Application error** / **Digest: …** / 500 | Vercel に `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` と `CLERK_SECRET_KEY` があるか確認し、保存後 **Redeploy**。ローカルでは `.env.local` にあるが Vercel に無いとよく起きる |
 | Clerk ログイン後にループ | `AFTER_SIGN_IN_URL` と Clerk ダッシュボードの Allowed origins を確認 |
-| API が 401 | ログイン状態で Cookie が付いているか、本番ドメインが Clerk に登録されているか |
+| API が 401 | ログイン状態で Cookie が付いているか、`https://xxxx.vercel.app` が Clerk（Development）に登録されているか |
 | DB エラー | `SUPABASE_SERVICE_ROLE_KEY` とマイグレーション適用状況を確認 |
 
 ---
