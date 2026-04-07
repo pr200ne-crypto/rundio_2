@@ -1,11 +1,12 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { getSupabasePublishableKey } from '@/lib/supabase/env'
+import { tryGetSupabasePublicConfig } from '@/lib/supabase/env'
 
 const isPublicRoute = createRouteMatcher([
   '/',
   '/demo(.*)',
+  '/lp-1(.*)',
   '/sign-in(.*)',
   '/sign-up(.*)',
   '/api/health',
@@ -16,14 +17,17 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
     await auth.protect()
   }
 
+  const supabaseConfig = tryGetSupabasePublicConfig()
+  if (!supabaseConfig) {
+    return NextResponse.next({ request })
+  }
+
   let supabaseResponse = NextResponse.next({
     request,
   })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    getSupabasePublishableKey(),
-    {
+  try {
+    const supabase = createServerClient(supabaseConfig.url, supabaseConfig.key, {
       cookies: {
         getAll() {
           return request.cookies.getAll()
@@ -38,10 +42,12 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
           )
         },
       },
-    }
-  )
+    })
 
-  await supabase.auth.getUser()
+    await supabase.auth.getUser()
+  } catch {
+    return NextResponse.next({ request })
+  }
 
   return supabaseResponse
 })
