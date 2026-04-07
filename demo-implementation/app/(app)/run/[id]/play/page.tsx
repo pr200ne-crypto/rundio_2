@@ -49,10 +49,6 @@ export default async function PlayPage({ params }: Props) {
           <track kind="captions" />
         </audio>
       </div>
-      <p className="mt-4 text-xs text-zinc-600">
-        音が出ない場合は <code className="text-zinc-400">public/demo-audio/demo.mp3</code>{' '}
-        を配置してください。
-      </p>
       <Link
         href="/run/new"
         className="mt-10 block rounded-xl border border-zinc-600 py-3 text-center text-sm text-zinc-200"
