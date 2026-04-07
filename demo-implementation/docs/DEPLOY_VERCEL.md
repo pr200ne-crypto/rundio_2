@@ -133,6 +133,12 @@ Vercel で **Project Name** を変えると、`https://xxxx.vercel.app` の **`x
 - デプロイ成功後、Vercel の **Deployments** から **Visit** をクリック
 - 表示された URL が **本番 URL**（課題提出用にコピー可能）
 
+**いまの本番が、意図した Git の状態を反映しているか**は、コミット ID は push のたびに変わるため、ドキュメントに固定の例は書きません。次で確認してください。
+
+- **Deployments** を開き、**Production**（または **Current** と表示されている本番用）のデプロイを選ぶ  
+- 詳細画面の **Source**（または同等の欄）に出る **ブランチ名**と**コミット**を、GitHub 上の同じブランチの先頭と見比べる  
+- **Preview** 用デプロイや **手動 Redeploy** だけを見ると、本番 URL と一致しないことがある。**本番行**を基準にする  
+
 動作確認:
 
 - `https://<本番URL>/api/health` → JSON `{"ok":true,...}`（認証不要）
