@@ -1,8 +1,11 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
-import { tryGetSupabasePublicConfig } from '@/lib/supabase/env'
 
+/**
+ * Clerk のみ。Supabase のセッション更新は Edge で request.cookies を触る実装と相性が悪く、
+ * Vercel で MIDDLEWARE_INVOCATION_FAILED になることがあるためミドルウェアから外す。
+ * 本アプリの保護ルートは Clerk。DB はサーバー側で service role / server client を利用。
+ */
 const isPublicRoute = createRouteMatcher([
   '/',
   '/demo(.*)',
@@ -16,45 +19,11 @@ export default clerkMiddleware(async (auth, request: NextRequest) => {
   if (!isPublicRoute(request)) {
     await auth.protect()
   }
-
-  const supabaseConfig = tryGetSupabasePublicConfig()
-  if (!supabaseConfig) {
-    return NextResponse.next({ request })
-  }
-
-  let supabaseResponse = NextResponse.next({
-    request,
-  })
-
-  try {
-    const supabase = createServerClient(supabaseConfig.url, supabaseConfig.key, {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll()
-        },
-        setAll(cookiesToSet: { name: string; value: string; options?: object }[]) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
-          supabaseResponse = NextResponse.next({
-            request,
-          })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
-        },
-      },
-    })
-
-    await supabase.auth.getUser()
-  } catch {
-    return NextResponse.next({ request })
-  }
-
-  return supabaseResponse
+  return NextResponse.next({ request })
 })
 
 export const config = {
   matcher: [
-    // _next（画像最適化 /static 含む）は除外 — ミドルウェアが走ると画像が壊れることがある
     '/((?!_next/|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
     '/(api|trpc)(.*)',
   ],
