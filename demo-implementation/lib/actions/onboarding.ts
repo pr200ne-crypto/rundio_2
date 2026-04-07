@@ -3,10 +3,25 @@
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
+import {
+  COURSE_PRESETS,
+  DISTANCE_OPTIONS_KM,
+  DURATION_OPTIONS_MIN,
+  LIKES_OPTIONS,
+  PURPOSE_OPTIONS,
+} from '@/lib/onboarding-options'
 import { ensureSupabaseUser } from '@/lib/supabase/auth-helpers'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
 
 export type OnboardingActionState = { error: string | null }
+
+const LIKES_SET = new Set(LIKES_OPTIONS.map((o) => o.value))
+const PURPOSE_SET = new Set(PURPOSE_OPTIONS.map((o) => o.value))
+const DURATION_SET = new Set<number>([...DURATION_OPTIONS_MIN])
+
+function isAllowedDistance(km: number): boolean {
+  return DISTANCE_OPTIONS_KM.some((d) => Math.abs(d - km) < 1e-6)
+}
 
 function supabaseErrorMessage(err: unknown): string {
   if (err == null) return '不明なエラー'
@@ -60,31 +75,46 @@ export async function saveRunnerProfile(
 
   const likes_notes = String(formData.get('likes_notes') ?? '').trim()
   const run_purpose = String(formData.get('run_purpose') ?? '').trim()
-  const course_label = String(formData.get('course_label') ?? '').trim()
+  const presetId = String(formData.get('course_preset') ?? '').trim()
 
   const run_distance_km = parseFloat(String(formData.get('run_distance_km') ?? ''))
   const run_duration_min = parseInt(String(formData.get('run_duration_min') ?? ''), 10)
-  const course_lat = parseFloat(String(formData.get('course_lat') ?? ''))
-  const course_lng = parseFloat(String(formData.get('course_lng') ?? ''))
 
-  if (!Number.isFinite(run_distance_km) || run_distance_km <= 0 || run_distance_km > 200) {
+  if (!LIKES_SET.has(likes_notes)) {
     return {
-      error: '走る距離（km）を正しく入力してください（0 より大きく 200 以下）。',
+      error: '好み・好物の選択が正しくありません。',
     }
   }
-  if (!Number.isFinite(run_duration_min) || run_duration_min < 5 || run_duration_min > 600) {
+  if (!PURPOSE_SET.has(run_purpose)) {
     return {
-      error: '走る時間（分）を正しく入力してください（5〜600）。',
+      error: '走る目的の選択が正しくありません。',
     }
   }
-  if (!Number.isFinite(course_lat) || !Number.isFinite(course_lng)) {
+  if (!Number.isFinite(run_distance_km) || !isAllowedDistance(run_distance_km)) {
     return {
-      error: '地図をタップしてコースの起点を選んでから、「保存して次へ」を押してください。',
+      error: '距離の選択が正しくありません。',
     }
   }
+  if (!Number.isFinite(run_duration_min) || !DURATION_SET.has(run_duration_min)) {
+    return {
+      error: '時間の選択が正しくありません。',
+    }
+  }
+
+  const preset = COURSE_PRESETS.find((p) => p.id === presetId)
+  if (!preset) {
+    return {
+      error: 'コースを選んでください。',
+    }
+  }
+
+  const course_lat = preset.lat
+  const course_lng = preset.lng
+  const course_label = preset.label
+
   if (course_lat < -90 || course_lat > 90 || course_lng < -180 || course_lng > 180) {
     return {
-      error: '地図上の位置が不正です。もう一度タップしてください。',
+      error: 'コース地点の座標が不正です。',
     }
   }
 
