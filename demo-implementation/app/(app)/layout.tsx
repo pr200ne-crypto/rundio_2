@@ -13,7 +13,7 @@ export default function AppShellLayout({ children }: { children: React.ReactNode
         >
           <RundioLogoOptionA variant="compact" />
         </Link>
-        <UserButton afterSignOutUrl="/" />
+        <UserButton />
       </header>
       <div className="mx-auto w-full max-w-lg flex-1 px-4 py-6 pb-24">{children}</div>
       <AppBottomNav />
