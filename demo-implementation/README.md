@@ -10,6 +10,12 @@
 | 4 | 認証 | **Clerk**（サインイン・アップ・UserButton） |
 | 5 | 本番デプロイ | **[Vercel 手順書](./docs/DEPLOY_VERCEL.md)**（本番 URL はデプロイ後に取得） |
 
+## 本番 URL（提出・ブックマーク用）
+
+- **現在の本番例**（Vercel プロジェクト名が `ru-ndio` のとき）: [https://ru-ndio.vercel.app](https://ru-ndio.vercel.app)  
+- Vercel の **Settings → General → Project Name** を **`rundio`** などに変えたあとは、`https://rundio.vercel.app` のように **プロジェクト名に合った URL** になる。**実際に開ける URL は** そのプロジェクトの **Deployments → Visit** を正とする。  
+- URL を変えたあと **Clerk** の許可ドメイン等を直す手順: `docs/DEPLOY_VERCEL.md` 内の見出し **「本番 URL を変えた直後にやること」** を開く（クリック順に OLD / NEW の置き換えを書いてある）。
+
 ## 必要なもの
 
 - Node.js 20+
