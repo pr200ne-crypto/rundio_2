@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LandingGoogleSignInButton } from '@/components/landing/LandingGoogleSignInButton'
 import { LandingHeroIllustration } from '@/components/LandingHeroIllustration'
 import { RundioLogoOptionA } from '@/components/RundioLogoOptionA'
 import { StartCta } from '@/components/StartCta'
@@ -55,6 +56,7 @@ export function LandingHero() {
               >
                 デモを見る
               </Link>
+              <LandingGoogleSignInButton />
             </div>
           </div>
           <LandingHeroIllustration />

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { LandingGoogleSignInButton } from '@/components/landing/LandingGoogleSignInButton'
 import { StartCta } from '@/components/StartCta'
 
 export function LandingFinalCta() {
@@ -28,6 +29,7 @@ export function LandingFinalCta() {
           >
             デモを見る
           </Link>
+          <LandingGoogleSignInButton />
         </div>
       </div>
     </section>
