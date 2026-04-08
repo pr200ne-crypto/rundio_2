@@ -1,19 +1,25 @@
 'use client'
 
 import { useAuth, useClerk } from '@clerk/nextjs'
+import Link from 'next/link'
 import { useCallback, useState } from 'react'
 
 const secondaryBtnClass =
   'inline-flex items-center justify-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-8 py-3.5 text-sm font-medium text-[var(--fg)] backdrop-blur-sm transition hover:border-[color-mix(in_srgb,var(--lp-dusk-lavender)_45%,transparent)] hover:bg-white/[0.07] disabled:cursor-not-allowed disabled:opacity-50'
 
-/** LP 用。Clerk 経由で Google OAuth を開始（ダッシュボードで Google を有効にすること） */
+/**
+ * LP 用。常に同じ枠のボタンを表示。
+ * - 未ログイン: Google OAuth
+ * - ログイン済み: ホームへ（見た目は同じトーンで出しっぱなし）
+ */
 export function LandingGoogleSignInButton() {
   const { isSignedIn, isLoaded: authLoaded } = useAuth()
   const clerk = useClerk()
   const [busy, setBusy] = useState(false)
+  const ready = authLoaded && clerk.loaded
 
   const onClick = useCallback(async () => {
-    if (!authLoaded || !clerk.loaded) return
+    if (!ready) return
     const signIn = clerk.client?.signIn
     if (!signIn?.authenticateWithRedirect) return
     setBusy(true)
@@ -28,22 +34,27 @@ export function LandingGoogleSignInButton() {
       console.error(e)
       setBusy(false)
     }
-  }, [authLoaded, clerk, clerk.loaded])
+  }, [ready, clerk])
 
-  // 未ロード時は isSignedIn が false のままなので先にボタンが出て、ロード後にログイン済みと判明すると消える（チラつき）を防ぐ
-  if (!authLoaded || !clerk.loaded) return null
-  if (isSignedIn) return null
+  if (ready && isSignedIn) {
+    return (
+      <Link href="/home" className={secondaryBtnClass}>
+        <GoogleMark className="h-[18px] w-[18px] shrink-0" aria-hidden />
+        ホームへ
+      </Link>
+    )
+  }
 
   return (
     <button
       type="button"
       onClick={onClick}
-      disabled={busy}
+      disabled={!ready || busy}
       className={secondaryBtnClass}
       aria-busy={busy}
     >
       <GoogleMark className="h-[18px] w-[18px] shrink-0" aria-hidden />
-      {busy ? 'リダイレクト中…' : 'Googleでログイン'}
+      {!ready ? '読み込み中…' : busy ? 'リダイレクト中…' : 'Googleでログイン'}
     </button>
   )
 }
