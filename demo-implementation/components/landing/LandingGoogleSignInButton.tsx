@@ -14,10 +14,12 @@ export function LandingGoogleSignInButton() {
 
   const onClick = useCallback(async () => {
     if (!authLoaded || !clerk.loaded) return
+    const signIn = clerk.client?.signIn
+    if (!signIn?.authenticateWithRedirect) return
     setBusy(true)
     try {
       const origin = window.location.origin
-      await clerk.client.signIn.authenticateWithRedirect({
+      await signIn.authenticateWithRedirect({
         strategy: 'oauth_google',
         redirectUrl: `${origin}/sign-in`,
         redirectUrlComplete: `${origin}/home`,
@@ -26,7 +28,7 @@ export function LandingGoogleSignInButton() {
       console.error(e)
       setBusy(false)
     }
-  }, [authLoaded, clerk.loaded, clerk.client.signIn])
+  }, [authLoaded, clerk, clerk.loaded])
 
   if (isSignedIn) return null
 
