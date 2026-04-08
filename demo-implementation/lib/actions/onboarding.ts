@@ -3,24 +3,14 @@
 import { auth } from '@clerk/nextjs/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import {
-  COURSE_PRESETS,
-  DISTANCE_OPTIONS_KM,
-  DURATION_OPTIONS_MIN,
-  LIKES_OPTIONS,
-  PURPOSE_OPTIONS,
-} from '@/lib/onboarding-options'
+import { parseRunnerProfileForm } from '@/lib/profile-form'
 import { ensureSupabaseUser } from '@/lib/supabase/auth-helpers'
 import { createServiceRoleClient } from '@/lib/supabase/service-role'
 
-export type OnboardingActionState = { error: string | null }
-
-const LIKES_SET = new Set(LIKES_OPTIONS.map((o) => o.value))
-const PURPOSE_SET = new Set(PURPOSE_OPTIONS.map((o) => o.value))
-const DURATION_SET = new Set<number>([...DURATION_OPTIONS_MIN])
-
-function isAllowedDistance(km: number): boolean {
-  return DISTANCE_OPTIONS_KM.some((d) => Math.abs(d - km) < 1e-6)
+export type OnboardingActionState = {
+  error: string | null
+  /** ユーザー画面のプロフィール更新成功時のみ true */
+  saved?: boolean
 }
 
 function supabaseErrorMessage(err: unknown): string {
@@ -33,14 +23,10 @@ function supabaseErrorMessage(err: unknown): string {
   return String(err)
 }
 
-/**
- * オンボーディング送信。本番で throw すると Digest だけになるため、
- * 検証・DB 失敗は { error } で返し画面上に表示する。
- */
-export async function saveRunnerProfile(
-  _prev: OnboardingActionState,
-  formData: FormData
-): Promise<OnboardingActionState> {
+async function upsertRunnerProfileForClerkUser(): Promise<
+  | { ok: true; supabase: ReturnType<typeof createServiceRoleClient>; userRowId: string }
+  | { ok: false; error: string }
+> {
   const { userId } = await auth()
   if (!userId) redirect('/sign-in')
 
@@ -48,6 +34,7 @@ export async function saveRunnerProfile(
     await ensureSupabaseUser()
   } catch (e) {
     return {
+      ok: false,
       error: `Supabase にユーザー情報を保存できませんでした。Vercel の SUPABASE_SERVICE_ROLE_KEY（service_role の JWT 全文）と NEXT_PUBLIC_SUPABASE_URL を確認してください。詳細: ${supabaseErrorMessage(e)}`,
     }
   }
@@ -56,9 +43,7 @@ export async function saveRunnerProfile(
   try {
     supabase = createServiceRoleClient()
   } catch (e) {
-    return {
-      error: supabaseErrorMessage(e),
-    }
+    return { ok: false, error: supabaseErrorMessage(e) }
   }
 
   const { data: userRow, error: userErr } = await supabase
@@ -69,66 +54,39 @@ export async function saveRunnerProfile(
 
   if (userErr || !userRow) {
     return {
+      ok: false,
       error: `ユーザー情報の取得に失敗しました。詳細: ${supabaseErrorMessage(userErr)}`,
     }
   }
 
-  const likes_notes = String(formData.get('likes_notes') ?? '').trim()
-  const run_purpose = String(formData.get('run_purpose') ?? '').trim()
-  const presetId = String(formData.get('course_preset') ?? '').trim()
+  return { ok: true, supabase, userRowId: userRow.id }
+}
 
-  const run_distance_km = parseFloat(String(formData.get('run_distance_km') ?? ''))
-  const run_duration_min = parseInt(String(formData.get('run_duration_min') ?? ''), 10)
+/**
+ * オンボーディング送信。本番で throw すると Digest だけになるため、
+ * 検証・DB 失敗は { error } で返し画面上に表示する。
+ */
+export async function saveRunnerProfile(
+  _prev: OnboardingActionState,
+  formData: FormData
+): Promise<OnboardingActionState> {
+  const ctx = await upsertRunnerProfileForClerkUser()
+  if (!ctx.ok) return { error: ctx.error }
 
-  if (!LIKES_SET.has(likes_notes)) {
-    return {
-      error: '好み・好物の選択が正しくありません。',
-    }
-  }
-  if (!PURPOSE_SET.has(run_purpose)) {
-    return {
-      error: '走る目的の選択が正しくありません。',
-    }
-  }
-  if (!Number.isFinite(run_distance_km) || !isAllowedDistance(run_distance_km)) {
-    return {
-      error: '距離の選択が正しくありません。',
-    }
-  }
-  if (!Number.isFinite(run_duration_min) || !DURATION_SET.has(run_duration_min)) {
-    return {
-      error: '時間の選択が正しくありません。',
-    }
-  }
+  const parsed = parseRunnerProfileForm(formData)
+  if (!parsed.ok) return { error: parsed.error }
 
-  const preset = COURSE_PRESETS.find((p) => p.id === presetId)
-  if (!preset) {
-    return {
-      error: 'コースを選んでください。',
-    }
-  }
-
-  const course_lat = preset.lat
-  const course_lng = preset.lng
-  const course_label = preset.label
-
-  if (course_lat < -90 || course_lat > 90 || course_lng < -180 || course_lng > 180) {
-    return {
-      error: 'コース地点の座標が不正です。',
-    }
-  }
-
-  const { error } = await supabase.from('runner_profiles').upsert(
+  const { error } = await ctx.supabase.from('runner_profiles').upsert(
     {
-      user_id: userRow.id,
-      likes_notes: likes_notes || null,
-      run_purpose: run_purpose || null,
+      user_id: ctx.userRowId,
+      likes_notes: parsed.likes_notes || null,
+      run_purpose: parsed.run_purpose || null,
       course_vibes: null,
-      run_distance_km,
-      run_duration_min,
-      course_lat,
-      course_lng,
-      course_label: course_label || null,
+      run_distance_km: parsed.run_distance_km,
+      run_duration_min: parsed.run_duration_min,
+      course_lat: parsed.course_lat,
+      course_lng: parsed.course_lng,
+      course_label: parsed.course_label,
       updated_at: new Date().toISOString(),
     },
     { onConflict: 'user_id' }
@@ -141,5 +99,45 @@ export async function saveRunnerProfile(
   }
 
   revalidatePath('/home')
+  revalidatePath('/user')
   redirect('/run/new')
+}
+
+/** ユーザー画面からのプロフィール更新（リダイレクトなし） */
+export async function updateRunnerProfile(
+  _prev: OnboardingActionState,
+  formData: FormData
+): Promise<OnboardingActionState> {
+  const ctx = await upsertRunnerProfileForClerkUser()
+  if (!ctx.ok) return { error: ctx.error }
+
+  const parsed = parseRunnerProfileForm(formData)
+  if (!parsed.ok) return { error: parsed.error }
+
+  const { error } = await ctx.supabase.from('runner_profiles').upsert(
+    {
+      user_id: ctx.userRowId,
+      likes_notes: parsed.likes_notes || null,
+      run_purpose: parsed.run_purpose || null,
+      course_vibes: null,
+      run_distance_km: parsed.run_distance_km,
+      run_duration_min: parsed.run_duration_min,
+      course_lat: parsed.course_lat,
+      course_lng: parsed.course_lng,
+      course_label: parsed.course_label,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: 'user_id' }
+  )
+
+  if (error) {
+    return {
+      error: `プロフィールを保存できませんでした。詳細: ${supabaseErrorMessage(error)}`,
+    }
+  }
+
+  revalidatePath('/home')
+  revalidatePath('/user')
+  revalidatePath('/onboarding')
+  return { error: null, saved: true }
 }

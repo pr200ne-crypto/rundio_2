@@ -1,63 +1,45 @@
+import Image from 'next/image'
+
 /**
- * LP 右カラム装飾。外部画像ファイル不要（Vercel デプロイで欠落しない）。
- * ブランド色（RUN オレンジ / dio シアン / zinc）のグラデ＋軽い SVG。
+ * LP ヒーロー右カラム。マジックアワーのランナー写真を、ネイビー基調の UI に馴染むよう
+ * 角丸・リング・グラデオーバーレイでトンマナを合わせる。
+ *
+ * 差し替え: `public/images/lp-hero-runners.jpg`（横長 JPEG 推奨）
  */
 export function LandingHeroIllustration() {
   return (
     <div className="mx-auto flex w-full max-w-md justify-center lg:mx-0 lg:max-w-none lg:justify-end">
-      <div className="relative aspect-square w-full max-w-[22rem] overflow-hidden rounded-[2rem] border border-zinc-700/60 bg-zinc-950 shadow-[0_0_48px_rgba(34,211,238,0.12)] ring-1 ring-cyan-500/10">
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-950 to-zinc-900"
-          aria-hidden
-        />
-        <svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 400 400"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          aria-hidden
-        >
-          <defs>
-            <linearGradient id="hero-run" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#fb923c" />
-              <stop offset="50%" stopColor="#fbbf24" />
-              <stop offset="100%" stopColor="#fdba74" />
-            </linearGradient>
-            <linearGradient id="hero-dio" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#38bdf8" />
-              <stop offset="100%" stopColor="#22d3ee" />
-            </linearGradient>
-          </defs>
-          <path
-            d="M48 280 Q120 200 200 220 T352 140"
-            stroke="url(#hero-run)"
-            strokeWidth="6"
-            strokeLinecap="round"
-            opacity="0.85"
+      <figure className="relative w-full max-w-[22rem] overflow-hidden rounded-[2rem] border border-white/10 bg-[var(--lp-navy-veil)] shadow-[0_0_60px_-8px_rgba(99,102,241,0.25)] ring-1 ring-[color-mix(in_srgb,var(--lp-dusk-lavender)_22%,transparent)] lg:max-w-[28rem]">
+        <div className="relative aspect-[5/4] w-full sm:aspect-[16/11]">
+          <Image
+            src="/images/lp-hero-runners.jpg"
+            alt="夕方の光と水面のきらめきを背景に、走る二人のシルエット"
+            fill
+            className="object-cover object-[center_35%] saturate-[1.05] contrast-[1.03]"
+            sizes="(max-width: 1024px) 22rem, 28rem"
+            priority
           />
-          <path
-            d="M72 320 Q180 260 260 180 T340 96"
-            stroke="url(#hero-dio)"
-            strokeWidth="4"
-            strokeLinecap="round"
-            opacity="0.55"
+          {/* 下辺を LP 背景ネイビーに溶かす */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--bg)] via-[color-mix(in_srgb,var(--bg)_55%,transparent)] to-transparent"
+            aria-hidden
           />
-          <circle cx="200" cy="200" r="28" fill="url(#hero-dio)" opacity="0.35" />
-          <circle cx="200" cy="200" r="12" fill="url(#hero-run)" opacity="0.9" />
-        </svg>
-        <div
-          className="pointer-events-none absolute inset-0 mix-blend-soft-light bg-gradient-to-br from-sky-400/30 via-amber-400/15 to-orange-500/25"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-t from-zinc-950/85 via-zinc-950/25 to-cyan-950/20"
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute inset-0 shadow-[inset_0_0_72px_rgba(34,211,238,0.14)]"
-          aria-hidden
-        />
-      </div>
+          {/* マジックアワー系の色気（派手にしすぎない） */}
+          <div
+            className="pointer-events-none absolute inset-0 mix-blend-soft-light bg-gradient-to-tr from-[color-mix(in_srgb,var(--lp-dawn-apricot)_18%,transparent)] via-transparent to-[color-mix(in_srgb,var(--lp-dusk-indigo)_22%,transparent)]"
+            aria-hidden
+          />
+          {/* 左右の軽いベネチアン */}
+          <div
+            className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[var(--bg)]/50 via-transparent to-[var(--bg)]/50 opacity-70"
+            aria-hidden
+          />
+          <div
+            className="pointer-events-none absolute inset-0 shadow-[inset_0_0_80px_rgba(10,15,26,0.45)]"
+            aria-hidden
+          />
+        </div>
+      </figure>
     </div>
   )
 }

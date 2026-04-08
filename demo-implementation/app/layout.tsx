@@ -3,8 +3,9 @@ import type { Metadata } from 'next'
 import { clerkAppearance } from '@/lib/clerk-appearance'
 import './globals.css'
 
-const pageBg = '#09090b'
-const pageFg = '#f4f4f5'
+/** globals.css の :root --bg / --fg と同一に保つ */
+const pageBg = '#0a0f1a'
+const pageFg = '#f1f5f9'
 
 /** ビルド時に Clerk キー未設定でも prerender を避ける */
 export const dynamic = 'force-dynamic'
@@ -23,12 +24,12 @@ export default function RootLayout({
     <ClerkProvider appearance={clerkAppearance}>
       <html
         lang="ja"
-        className="h-full bg-zinc-950"
+        className="h-full"
         style={{ backgroundColor: pageBg }}
         suppressHydrationWarning
       >
         <body
-          className="min-h-screen bg-zinc-950 text-zinc-100 antialiased"
+          className="min-h-screen antialiased"
           style={{ backgroundColor: pageBg, color: pageFg }}
         >
           {children}

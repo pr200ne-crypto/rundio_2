@@ -1,13 +1,33 @@
 @import 'tailwindcss';
 
-/* Tailwind v4 の preflight より確実に効かせる（LP は常にダーク基調） */
+/* Tailwind v4 の preflight より確実に効かせる（サイトはダーク基調） */
 @layer base {
   :root {
-    --bg: #09090b;
-    --fg: #f4f4f5;
+    /* アプリ全体のベース（ダークネイビー） */
+    --bg: #0a0f1a;
+    --fg: #f1f5f9;
     --accent: #22d3ee;
-    --muted: #a1a1aa;
+    --muted: #94a3b8;
     color-scheme: dark;
+
+    /* LP トークン：朝焼け */
+    --lp-dawn-peach: #fda4af;
+    --lp-dawn-rose: #fb7185;
+    --lp-dawn-orange: #fb923c;
+    --lp-dawn-apricot: #fdba74;
+    --lp-dawn-gold: #fde68a;
+
+    /* LP トークン：マジックアワー → 夜 */
+    --lp-dusk-lavender: #a78bfa;
+    --lp-dusk-violet: #c084fc;
+    --lp-dusk-indigo: #6366f1;
+    --lp-dusk-deep: #312e81;
+    --lp-navy-veil: #0c1226;
+
+    /* LP CTA（主ボタン：サンライズ寄りオレンジ） */
+    --lp-cta-primary: #fb923c;
+    --lp-cta-primary-hover: #fdba74;
+    --lp-cta-fg: #0a0f1a;
   }
 
   html {
@@ -31,6 +51,6 @@
 /* @layer より後ろ＋!important で、preflight / 拡張機能との干渉を潰す */
 html,
 body {
-  background-color: #09090b !important;
-  color: #f4f4f5 !important;
+  background-color: var(--bg) !important;
+  color: var(--fg) !important;
 }

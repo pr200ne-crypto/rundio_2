@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 
 const tabs = [
   { href: '/home', label: 'ホーム' },
-  { href: '/posts', label: '投稿' },
+  { href: '/user', label: 'ユーザー' },
   { href: '/run/new', label: 'ラン' },
 ] as const
 
@@ -22,8 +22,8 @@ export function AppBottomNav() {
           const active =
             href === '/home'
               ? pathname === '/home' || pathname === '/onboarding'
-              : href === '/posts'
-                ? pathname === '/posts' || pathname.startsWith('/posts/')
+              : href === '/user'
+                ? pathname === '/user' || pathname.startsWith('/user/')
                 : href === '/run/new'
                   ? pathname.startsWith('/run')
                   : pathname === href || pathname.startsWith(`${href}/`)

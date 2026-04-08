@@ -6,6 +6,7 @@
     "dev": "npm run dev --prefix demo-implementation",
     "dev:clean": "npm run dev:clean --prefix demo-implementation",
     "build": "npm run build --prefix demo-implementation",
+    "lint": "npm run lint --prefix demo-implementation",
     "start": "npm run start --prefix demo-implementation"
   }
 }

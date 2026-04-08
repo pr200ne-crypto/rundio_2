@@ -79,3 +79,22 @@ export const COURSE_PRESETS: {
     lng: 139.7753,
   },
 ]
+
+/** 保存済み座標・ラベルからプリセット id を推定（編集フォームの初期値用） */
+export function resolveCoursePresetId(
+  lat: number | null | undefined,
+  lng: number | null | undefined,
+  label: string | null | undefined
+): string {
+  if (lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng)) {
+    const byCoord = COURSE_PRESETS.find(
+      (p) => Math.abs(p.lat - lat) < 1e-4 && Math.abs(p.lng - lng) < 1e-4
+    )
+    if (byCoord) return byCoord.id
+  }
+  if (label) {
+    const byLabel = COURSE_PRESETS.find((p) => p.label === label)
+    if (byLabel) return byLabel.id
+  }
+  return ''
+}

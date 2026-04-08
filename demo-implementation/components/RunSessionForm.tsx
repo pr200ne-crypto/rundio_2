@@ -1,8 +1,26 @@
 'use client'
 
+import type { CSSProperties } from 'react'
 import { useState } from 'react'
 import { createBroadcastSession } from '@/lib/actions/broadcast'
+import {
+  DISTANCE_OPTION_LABELS,
+  DISTANCE_OPTIONS_KM,
+  DURATION_OPTION_LABELS,
+  DURATION_OPTIONS_MIN,
+} from '@/lib/onboarding-options'
 import { DEFAULT_ASSUMED_PACE_MIN_PER_KM } from '@/lib/running/constants'
+
+const selectClassName =
+  'mt-1 w-full appearance-none rounded-xl border border-zinc-700 bg-zinc-900 py-3 pl-3 pr-10 text-sm text-zinc-100 outline-none focus:border-cyan-600 focus:ring-1 focus:ring-cyan-600'
+
+const selectChevronStyle: CSSProperties = {
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23a1a1aa'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")",
+  backgroundSize: '1rem',
+  backgroundPosition: 'right 0.75rem center',
+  backgroundRepeat: 'no-repeat',
+}
 
 export function RunSessionForm() {
   const [mode, setMode] = useState<'time' | 'distance'>('time')
@@ -33,30 +51,42 @@ export function RunSessionForm() {
       </fieldset>
       {mode === 'time' ? (
         <label className="block">
-          <span className="text-xs text-zinc-500">目標時間（分）</span>
-          <input
-            type="number"
+          <span className="text-xs text-zinc-500">目標時間</span>
+          <select
             name="duration_min"
-            min={5}
-            max={180}
-            defaultValue={30}
             required
-            className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
-          />
+            defaultValue="30"
+            className={selectClassName}
+            style={selectChevronStyle}
+            aria-label="目標時間を選択"
+          >
+            {DURATION_OPTIONS_MIN.map((min) => (
+              <option key={min} value={String(min)}>
+                {DURATION_OPTION_LABELS[min] ?? `${min} 分`}
+              </option>
+            ))}
+          </select>
         </label>
       ) : (
         <label className="block">
-          <span className="text-xs text-zinc-500">目標距離（km）</span>
-          <input
-            type="number"
+          <span className="text-xs text-zinc-500">目標距離</span>
+          <select
             name="distance_km"
-            min={0.5}
-            max={80}
-            step={0.1}
-            defaultValue={5}
             required
-            className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100"
-          />
+            defaultValue="5"
+            className={selectClassName}
+            style={selectChevronStyle}
+            aria-label="目標距離を選択"
+          >
+            {DISTANCE_OPTIONS_KM.map((km) => {
+              const key = String(km)
+              return (
+                <option key={key} value={key}>
+                  {DISTANCE_OPTION_LABELS[key] ?? `${km} km`}
+                </option>
+              )
+            })}
+          </select>
         </label>
       )}
       <button
