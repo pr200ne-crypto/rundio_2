@@ -30,13 +30,15 @@ export function LandingGoogleSignInButton() {
     }
   }, [authLoaded, clerk, clerk.loaded])
 
+  // 未ロード時は isSignedIn が false のままなので先にボタンが出て、ロード後にログイン済みと判明すると消える（チラつき）を防ぐ
+  if (!authLoaded || !clerk.loaded) return null
   if (isSignedIn) return null
 
   return (
     <button
       type="button"
       onClick={onClick}
-      disabled={!authLoaded || !clerk.loaded || busy}
+      disabled={busy}
       className={secondaryBtnClass}
       aria-busy={busy}
     >
